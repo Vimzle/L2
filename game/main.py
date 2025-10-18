@@ -34,7 +34,7 @@ while running:
     dy = keys[pygame.K_DOWN] - keys[pygame.K_UP]
     ragdoll.move(dx, dy, dt)
 
-    field.move_treats(dt)
+    field.move_treats(ragdoll, cat_mask, treat_mask, dt)
     score += field.collect_treats(ragdoll, cat_mask, treat_mask)
     ragdoll.decrease_satiety(dt)
     if ragdoll.satiety == 0:
