@@ -1,29 +1,34 @@
-class Ragdoll:
+class Ragdoll():
     SPEED = 100
     MAX_SATIETY = 100
 
-    def __init__(self, field_width, field_height, ragdoll_size, cat_mask, treat_mask):
+    def __init__(self, ragdoll_size, cat_mask, treat_mask, resizable):
+        self.ref_ragdoll_size = ragdoll_size
         self.satiety = self.MAX_SATIETY
-        self.x = 0
-        self.y = 0
-        self.max_x = field_width - ragdoll_size
-        self.max_y = field_height - ragdoll_size
+        self.ref_x = 0
+        self.ref_y = 0
         self.cat_mask = cat_mask
         self.treat_mask = treat_mask
-
+        self.resizable = resizable
+        
+    @property
+    def speed(self):
+        return self.resizable.scale_value(self.SPEED)
+    
     def move(self, dx, dy, dt):
-        self.x += dx * self.SPEED * dt
-        self.y += dy * self.SPEED * dt
-        self.x = max(0, min(self.max_x, self.x))
-        self.y = max(0, min(self.max_y, self.y))
+        self.ref_x += dx * self.speed * dt
+        self.ref_y += dy * self.speed * dt
+        self.ref_x = max(0, min(self.resizable.ref_field_size - self.ref_ragdoll_size, self.ref_x))
+        self.ref_y = max(0, min(self.resizable.ref_field_size - self.ref_ragdoll_size, self.ref_y))
 
     def increase_satiety(self, amount):
         self.satiety = min(self.MAX_SATIETY, self.satiety + amount)
 
-    def decrease_satiety(self, dt, decay_rate=8):
+    def decrease_satiety(self, dt, decay_rate=6):
         self.satiety -= decay_rate * dt
         if self.satiety < 0:
             self.satiety = 0
             
     def is_overlapped(self, dx, dy):
         return self.cat_mask.overlap(self.treat_mask, (int(dx), int(dy)))
+    

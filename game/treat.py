@@ -2,8 +2,8 @@ import random
 
 class Treat:
     def __init__(self, x, y, lifetime=0.0):
-        self.x = x
-        self.y = y
+        self.ref_x = x # (0..FIELD_SIZE)
+        self.ref_y = y
         self.timer = lifetime
 
 class TreatManager:
@@ -11,11 +11,11 @@ class TreatManager:
     TREAT_LIFETIME = 6
     TREAT_MIN_DISTANCE = 100
 
-    def __init__(self, field_width, field_height, treat_size):
-        self.field_width = field_width
-        self.field_height = field_height
-        self.treat_size = treat_size 
+    def __init__(self, treat_size, resizable):
+        self.ref_treat_size = treat_size 
+        self.resizable = resizable
         self._treats = []  
+
     @property
     def treats(self):
         return list(self._treats)
@@ -26,20 +26,24 @@ class TreatManager:
         return (dx**2 + dy**2)**0.5
         
     def _spawn_treat(self, ragdoll):
-        margin = self.treat_size // 2
+        margin = self.ref_treat_size // 2
         while True:
-            x = random.randint(margin, self.field_width - self.treat_size - margin)
-            y = random.randint(margin, self.field_height - self.treat_size - margin)
-            if self._is_valid_treat_position(x,y, ragdoll):
-                self._treats.append(Treat(x, y))
+            ref_x = random.randint(margin, self.resizable.ref_field_size - self.ref_treat_size - margin)
+            ref_y = random.randint(margin, self.resizable.ref_field_size - self.ref_treat_size - margin)
+            if self._is_valid_treat_position(ref_x,ref_y, ragdoll):
+                self._treats.append(Treat(ref_x, ref_y))
                 break
-    def _is_valid_treat_position(self, x, y, ragdoll) -> bool:
+    def _is_valid_treat_position(self, ref_x, ref_y, ragdoll) -> bool:
         # check ragdoll
-        if ragdoll.is_overlapped(x - ragdoll.x, y - ragdoll.y) or TreatManager._distance(x, ragdoll.x, y, ragdoll.y) < self.TREAT_MIN_DISTANCE:
+        # masks are based on scaled images -> use scaled coords
+        dx_scaled = self.resizable.scale_value(ref_x - ragdoll.ref_x)
+        dy_scaled = self.resizable.scale_value(ref_y - ragdoll.ref_y)
+        if ragdoll.is_overlapped(dx_scaled, dy_scaled) or TreatManager._distance(ref_x, ragdoll.ref_x, ref_y, ragdoll.ref_y) < self.TREAT_MIN_DISTANCE:
             return False
         # check other treats
         for treat in self._treats:
-            if TreatManager._distance(x, treat.x, y, treat.y) < self.TREAT_MIN_DISTANCE:
+            # TREAT_MIN_DISTANCE is in reference space -> use ref coords
+            if TreatManager._distance(ref_x, treat.ref_x, ref_y, treat.ref_y) < self.TREAT_MIN_DISTANCE:
                 return False
         return True
 
@@ -58,9 +62,10 @@ class TreatManager:
     def collect_treats(self, ragdoll):
         score = 0
         for treat in self._treats:
-            dx = treat.x - ragdoll.x
-            dy = treat.y - ragdoll.y
-            if ragdoll.is_overlapped(dx, dy):
+            # masks are based on scaled images -> use scaled coords
+            dx_scaled = self.resizable.scale_value(treat.ref_x - ragdoll.ref_x)
+            dy_scaled = self.resizable.scale_value(treat.ref_y - ragdoll.ref_y)
+            if ragdoll.is_overlapped(dx_scaled, dy_scaled):
                 self._despawn_treat(treat)
                 score += 1
         return score
