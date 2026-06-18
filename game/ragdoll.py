@@ -10,6 +10,7 @@ class Ragdoll():
         self.cat_mask = cat_mask
         self.treat_mask = treat_mask
         self.resizable = resizable
+        self.is_catched = False
         
     @property
     def speed(self):
@@ -29,6 +30,6 @@ class Ragdoll():
         if self.satiety < 0:
             self.satiety = 0
             
-    def is_overlapped(self, dx, dy):
+    def collides_with_treat(self, dx, dy):
         return self.cat_mask.overlap(self.treat_mask, (int(dx), int(dy)))
     

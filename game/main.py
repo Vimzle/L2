@@ -20,10 +20,14 @@ while running:
             game.resizable.update(new_size)
             game.cat_img_scaled = game.resizable.scale_image(game.cat_img)
             game.treat_img_scaled = game.resizable.scale_image(game.treat_img)
+            game.ghost_img_scaled = game.resizable.scale_image(game.ghost_img)
             game.cat_mask = pygame.mask.from_surface(game.cat_img_scaled)
             game.treat_mask = pygame.mask.from_surface(game.treat_img_scaled)
+            game.ghost_mask = pygame.mask.from_surface(game.ghost_img_scaled)
             game.ragdoll.cat_mask = game.cat_mask
             game.ragdoll.treat_mask = game.treat_mask
+            game.ghost_manager.ghost_mask = game.ghost_mask
+
     keys = pygame.key.get_pressed()
     game.handle_input(keys, dt)
     game.update(dt)
