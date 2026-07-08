@@ -26,20 +26,19 @@ class GhostManager():
         dy = y - o_y
         return (dx**2 + dy**2)**0.5
     
-    def move(self, dx, dy, dt):
-        step = 0.3
-        if self.ghost.ref_x < self.ragdoll.ref_x:
-            dx += step
-        if self.ghost.ref_x > self.ragdoll.ref_x:
-            dx -= step
-        if self.ghost.ref_y < self.ragdoll.ref_y:
-            dy += step
-        if self.ghost.ref_y > self.ragdoll.ref_y:
-            dy -= step
-        self.ghost.ref_x += dx * self.speed * dt
-        self.ghost.ref_y += dy * self.speed * dt
-        self.ghost.ref_x = max(0, min(self.resizable.ref_field_size - self.ref_ghost_size, self.ghost.ref_x))
-        self.ghost.ref_y = max(0, min(self.resizable.ref_field_size - self.ref_ghost_size, self.ghost.ref_y))
+    def move(self, dt):
+        distance = self._distance(self.ragdoll.ref_x, self.ghost.ref_x, self.ragdoll.ref_y, self.ghost.ref_y)
+        if distance != 0:
+            # direction vector v(x,y) (ghost -> ragdoll)
+            # x: (self.ragdoll.ref_x - self.ghost.ref_x)
+            # y: (self.ragdoll.ref_y - self.ghost.ref_y)
+            # normalization -> v(x/|v|,y/|v|)
+            dx = (self.ragdoll.ref_x - self.ghost.ref_x) / distance 
+            dy = (self.ragdoll.ref_y - self.ghost.ref_y) / distance
+            self.ghost.ref_x += dx * self.speed * dt
+            self.ghost.ref_y += dy * self.speed * dt
+            self.ghost.ref_x = max(0, min(self.resizable.ref_field_size - self.ref_ghost_size, self.ghost.ref_x))
+            self.ghost.ref_y = max(0, min(self.resizable.ref_field_size - self.ref_ghost_size, self.ghost.ref_y))
         self.catch_ragdoll()
 
     def spawn_ghost(self):

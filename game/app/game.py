@@ -34,13 +34,13 @@ class Game:
         dx = keys[pygame.K_RIGHT] - keys[pygame.K_LEFT]
         dy = keys[pygame.K_DOWN] - keys[pygame.K_UP]
         self.ragdoll.move(dx, dy, dt)
-        if self.ghost_manager.ghost is not None:
-            self.ghost_manager.move(dx, dy, dt)
 
     def update(self, dt):
         if self.game_over: return
         self.ragdoll.decrease_satiety(dt)
         self.treat_manager.move_treats(self.ragdoll, self.ghost_manager, dt)
+        if self.ghost_manager.ghost is not None:
+            self.ghost_manager.move(dt)
         score = self.treat_manager.collect_treats(self.ragdoll)
         if score > 0:
             self.ragdoll.increase_satiety(20 * score)
