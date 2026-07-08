@@ -1,7 +1,7 @@
 import random
 
 class Ghost:
-    SPEED = 45
+    SPEED = 60
     GHOST_MIN_DISTANCE = 150
     def __init__(self, x, y):
         self.ref_x = x # (0..FIELD_SIZE)

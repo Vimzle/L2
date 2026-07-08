@@ -1,8 +1,8 @@
 import pygame
-from ragdoll import Ragdoll
-from treat import TreatManager
-from ghost import GhostManager
-from base import Resizable
+from logic.ragdoll import Ragdoll
+from logic.treat import TreatManager
+from logic.ghost import GhostManager
+from logic.base import Resizable
 
 class Game:
     FIELD_SIZE = 400

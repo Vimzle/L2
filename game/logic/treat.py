@@ -63,14 +63,14 @@ class TreatManager:
     def move_treats(self, ragdoll, ghost_manager, dt):
         while len(self._treats) < self.MAX_TREATS:
             self._spawn_treat(ragdoll, ghost_manager)
-        for treat in self._treats[:]:
+        for treat in self.treats:
             treat.timer += dt
             if treat.timer >= self.TREAT_LIFETIME:
                 self._despawn_treat(treat)
 
     def collect_treats(self, ragdoll):
         score = 0
-        for treat in self._treats[:]:
+        for treat in self.treats:
             # masks are based on scaled images -> use scaled coords
             dx_scaled = self.resizable.scale_value(treat.ref_x - ragdoll.ref_x)
             dy_scaled = self.resizable.scale_value(treat.ref_y - ragdoll.ref_y)
